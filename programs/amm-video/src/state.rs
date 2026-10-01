@@ -5,6 +5,7 @@ use anchor_lang::prelude::*;
 pub struct Config {
     pub seed: u64,                 // Seed to be able to create different pools / configs
     pub authority: Option<Pubkey>, // If we want an authority to lock the config account
+    pub treasury: Pubkey,          // Owner of the collected swap-fee accounts
     pub mint_x: Pubkey,            // Token X
     pub mint_y: Pubkey,            // Token Y
     pub fee: u16,                  // Swap fee in basis points

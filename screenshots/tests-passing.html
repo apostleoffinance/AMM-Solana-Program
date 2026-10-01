@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AMM Test Results</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #111315; color: #d8dedb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 8px; }
+    main { width: min(1120px, 100%); margin: 0 auto; border: 1px solid #343a37; background: #171a1c; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #343a37; }
+    h1 { margin: 0; font: 600 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .passed { color: #8dd7a8; font-size: 9px; }
+    pre { margin: 0; padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; font: 7px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .ok { color: #8dd7a8; }
+    .summary { color: #a7dfb7; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>cargo test -p amm-video</h1><span class="passed">PASS</span></header>
+        <pre>$ cargo test -p amm-video
+running 1 test
+<span class="ok">test test_id ... ok</span>
+<span class="summary">test result: ok. 1 passed; 0 failed</span>
+
+running 13 tests
+<span class="ok">test test_initialize ... ok</span>
+<span class="ok">test test_initialize_rejects_fee_at_or_above_one_hundred_percent ... ok</span>
+<span class="ok">test test_initial_deposit_rejects_mismatched_lp_issuance ... ok</span>
+<span class="ok">test test_deposit_rejects_zero_lp_amount ... ok</span>
+<span class="ok">test test_deposit_rejects_amounts_that_round_to_zero ... ok</span>
+<span class="ok">test test_swap_rejects_slippage_and_zero_input ... ok</span>
+<span class="ok">test test_deposit_mints_lp_and_funds_both_vaults ... ok</span>
+<span class="ok">test test_deposit_enforces_maximum_amounts_after_initial_liquidity ... ok</span>
+<span class="ok">test test_swap_reverse_direction_routes_y_fee_to_treasury ... ok</span>
+<span class="ok">test test_swap_routes_x_fee_to_treasury_and_prices_from_net_input ... ok</span>
+<span class="ok">test test_withdraw_burns_lp_and_returns_both_assets ... ok</span>
+<span class="ok">test test_withdraw_rejects_amount_above_total_lp_supply ... ok</span>
+<span class="ok">test test_withdraw_enforces_minimum_amounts ... ok</span>
+<span class="summary">test result: ok. 13 passed; 0 failed</span>
+
+<span class="summary">doc-tests: 0 passed; 0 failed</span></pre>
+  </main>
+</body>
+</html>

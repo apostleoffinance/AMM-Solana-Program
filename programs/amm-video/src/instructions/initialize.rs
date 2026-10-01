@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{Mint, Token, TokenAccount},
 };
 
-use crate::state::Config;
+use crate::{error::AmmError, state::Config};
 
 #[derive(Accounts)]
 #[instruction(seed: u64)]
@@ -13,6 +13,8 @@ pub struct Initialize<'info> {
     pub initializer: Signer<'info>,
     pub mint_x: Account<'info, Mint>,
     pub mint_y: Account<'info, Mint>,
+    /// CHECK: This address is stored as the immutable fee recipient for this pool.
+    pub treasury: UncheckedAccount<'info>,
     #[account(
         init,
         payer = initializer,
@@ -39,6 +41,20 @@ pub struct Initialize<'info> {
     #[account(
         init,
         payer = initializer,
+        associated_token::mint = mint_x,
+        associated_token::authority = treasury,
+    )]
+    pub treasury_x: Account<'info, TokenAccount>,
+    #[account(
+        init,
+        payer = initializer,
+        associated_token::mint = mint_y,
+        associated_token::authority = treasury,
+    )]
+    pub treasury_y: Account<'info, TokenAccount>,
+    #[account(
+        init,
+        payer = initializer,
         seeds = [b"config", seed.to_le_bytes().as_ref()],
         bump,
         space = Config::DISCRIMINATOR.len() + Config::INIT_SPACE,
@@ -57,9 +73,20 @@ impl<'info> Initialize<'info> {
         authority: Option<Pubkey>,
         bumps: InitializeBumps,
     ) -> Result<()> {
+        require!(
+            self.mint_x.decimals == 6 && self.mint_y.decimals == 6,
+            AmmError::InvalidPrecision
+        );
+        require!(
+            self.mint_x.key() != self.mint_y.key(),
+            AmmError::InvalidToken
+        );
+        require!(fee < 10_000, AmmError::InvalidFee);
+
         self.config.set_inner(Config {
             seed,
             authority,
+            treasury: self.treasury.key(),
             mint_x: self.mint_x.key(),
             mint_y: self.mint_y.key(),
             fee,

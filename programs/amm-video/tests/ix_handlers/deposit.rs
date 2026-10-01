@@ -20,33 +20,41 @@ pub fn create_deposit_ix(
     config: Pubkey,
     vault_x: Pubkey,
     vault_y: Pubkey,
+    amount: u64,
+    max_x: u64,
+    max_y: u64,
 ) -> Instruction {
     let user = payer.pubkey();
 
-    let user_x = CreateAssociatedTokenAccount::new(&mut svm, &payer, &mint_x)
-        .owner(&user)
-        .send()
-        .unwrap();
-    MintTo::new(&mut svm, &payer, &mint_x, &user_x, 1000000000)
-        .send()
-        .unwrap();
-
-    let user_y = CreateAssociatedTokenAccount::new(&mut svm, &payer, &mint_y)
-        .owner(&user)
-        .send()
-        .unwrap();
-    MintTo::new(&mut svm, &payer, &mint_y, &user_y, 1000000000)
-        .send()
-        .unwrap();
+    let user_x = associated_token::get_associated_token_address(&user, &mint_x);
+    let user_y = associated_token::get_associated_token_address(&user, &mint_y);
+    if svm.get_account(&user_x).is_none() {
+        CreateAssociatedTokenAccount::new(&mut svm, &payer, &mint_x)
+            .owner(&user)
+            .send()
+            .unwrap();
+        MintTo::new(&mut svm, &payer, &mint_x, &user_x, 1_000_000_000)
+            .send()
+            .unwrap();
+    }
+    if svm.get_account(&user_y).is_none() {
+        CreateAssociatedTokenAccount::new(&mut svm, &payer, &mint_y)
+            .owner(&user)
+            .send()
+            .unwrap();
+        MintTo::new(&mut svm, &payer, &mint_y, &user_y, 1_000_000_000)
+            .send()
+            .unwrap();
+    }
 
     let user_lp = associated_token::get_associated_token_address(&user, &mint_lp);
 
     Instruction::new_with_bytes(
         amm_video::id(),
         &amm_video::instruction::Deposit {
-            amount: 100_000_000,
-            max_x: 200_000_000,
-            max_y: 200_000_000,
+            amount,
+            max_x,
+            max_y,
         }
         .data(),
         amm_video::accounts::Deposit {

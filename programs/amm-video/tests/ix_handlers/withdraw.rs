@@ -20,6 +20,9 @@ pub fn create_withdraw_ix(
     config: Pubkey,
     vault_x: Pubkey,
     vault_y: Pubkey,
+    amount: u64,
+    min_x: u64,
+    min_y: u64,
 ) -> Instruction {
     let user = payer.pubkey();
     let user_x = associated_token::get_associated_token_address(&user, &mint_x);
@@ -29,9 +32,9 @@ pub fn create_withdraw_ix(
     Instruction::new_with_bytes(
         amm_video::id(),
         &amm_video::instruction::Withdraw {
-            amount: 10_000_000,
-            min_x: 20_000_000,
-            min_y: 20_000_000,
+            amount,
+            min_x,
+            min_y,
         }
         .data(),
         amm_video::accounts::Withdraw {
